@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IndoSpeech Demo</title>
+</head>
+<body>
+    <!-- Import library -->
+    <script src="indoSpeech.js"></script>
+    
+    <script>
+        // Inisialisasi dengan options
+        const tts = new IndoSpeech({
+            lang: 'id-ID',
+            rate: 1,
+            pitch: 1,
+            volume: 1,
+            onStart: () => console.log('Mulai berbicara'),
+            onEnd: () => console.log('Selesai berbicara'),
+            onError: (error) => console.error('Error:', error)
+        });
+
+        // Contoh penggunaan dasar
+        tts.speak('Halo, ini adalah text to speech bahasa Indonesia!')
+            .then(() => console.log('Speech selesai'))
+            .catch(error => console.error('Error:', error));
+
+        // Contoh penggunaan dengan async/await
+        async function demoSpeech() {
+            try {
+                // Ubah pengaturan
+                tts.setRate(1.2);
+                tts.setPitch(1.1);
+                
+                // Berbicara
+                await tts.speak('Ini adalah contoh text to speech.');
+                console.log('Speech pertama selesai');
+                
+                // Ubah pengaturan lagi
+                tts.setRate(0.8);
+                await tts.speak('Ini dengan kecepatan yang berbeda.');
+                console.log('Speech kedua selesai');
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Contoh kontrol pemutaran
+        function playPauseDemo() {
+            if (tts.isPaused()) {
+                tts.resume();
+            } else if (tts.isSpeaking()) {
+                tts.pause();
+            } else {
+                tts.speak('Ini adalah contoh text yang panjang yang bisa di pause dan resume.');
+            }
+        }
+
+        // Hentikan pemutaran
+        function stopDemo() {
+            tts.stop();
+        }
+    </script>
+</body>
+</html>
