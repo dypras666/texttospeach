@@ -1,65 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>IndoSpeech Demo</title>
-</head>
-<body>
-    <!-- Import library -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="indoSpeech.js"></script>
-    
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Text to Speech</h1>
+            <p class="text-gray-600">Convert text to speech with Indonesian language support</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <!-- Text Input -->
+            <div class="mb-6">
+                <textarea 
+                    id="textInput"
+                    class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ketik atau paste teks disini..."
+                >Halo! Ini adalah demo text to speech dengan dukungan Bahasa Indonesia.</textarea>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <button 
+                    id="playButton"
+                    class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                    </svg>
+                    Putar
+                </button>
+                <button 
+                    id="pauseButton"
+                    class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 flex items-center gap-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v4a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                    </svg>
+                    Jeda
+                </button>
+                <button 
+                    id="stopButton"
+                    class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+                    </svg>
+                    Stop
+                </button>
+            </div>
+
+            <!-- Settings -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Kecepatan: <span id="rateValue">1</span>
+                    </label>
+                    <input 
+                        type="range" 
+                        id="rate" 
+                        min="0.1" 
+                        max="2" 
+                        value="1" 
+                        step="0.1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Nada: <span id="pitchValue">1</span>
+                    </label>
+                    <input 
+                        type="range" 
+                        id="pitch" 
+                        min="0.1" 
+                        max="2" 
+                        value="1" 
+                        step="0.1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Volume: <span id="volumeValue">1</span>
+                    </label>
+                    <input 
+                        type="range" 
+                        id="volume" 
+                        min="0" 
+                        max="1" 
+                        value="1" 
+                        step="0.1"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-gray-600">
+            <p>Made with ❤️ by <a href="https://github.com/dypras666" class="text-blue-500 hover:text-blue-600">dypras666</a></p>
+        </div>
+    </div>
+
     <script>
-        // Inisialisasi dengan options
+        // Inisialisasi Text to Speech
         const tts = new IndoSpeech({
-            lang: 'id-ID',
-            rate: 1,
-            pitch: 1,
-            volume: 1,
-            onStart: () => console.log('Mulai berbicara'),
-            onEnd: () => console.log('Selesai berbicara'),
-            onError: (error) => console.error('Error:', error)
+            onStart: () => {
+                playButton.disabled = true;
+                pauseButton.disabled = false;
+                stopButton.disabled = false;
+            },
+            onEnd: () => {
+                playButton.disabled = false;
+                pauseButton.disabled = true;
+                stopButton.disabled = true;
+            },
+            onError: (error) => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat memproses text to speech');
+            }
         });
 
-        // Contoh penggunaan dasar
-        tts.speak('Halo, ini adalah text to speech bahasa Indonesia!')
-            .then(() => console.log('Speech selesai'))
-            .catch(error => console.error('Error:', error));
+        // Elements
+        const textInput = document.getElementById('textInput');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const stopButton = document.getElementById('stopButton');
+        const rateInput = document.getElementById('rate');
+        const pitchInput = document.getElementById('pitch');
+        const volumeInput = document.getElementById('volume');
+        const rateValue = document.getElementById('rateValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const volumeValue = document.getElementById('volumeValue');
 
-        // Contoh penggunaan dengan async/await
-        async function demoSpeech() {
-            try {
-                // Ubah pengaturan
-                tts.setRate(1.2);
-                tts.setPitch(1.1);
-                
-                // Berbicara
-                await tts.speak('Ini adalah contoh text to speech.');
-                console.log('Speech pertama selesai');
-                
-                // Ubah pengaturan lagi
-                tts.setRate(0.8);
-                await tts.speak('Ini dengan kecepatan yang berbeda.');
-                console.log('Speech kedua selesai');
-                
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Contoh kontrol pemutaran
-        function playPauseDemo() {
-            if (tts.isPaused()) {
+        // Event Listeners
+        playButton.addEventListener('click', () => {
+            if (tts.isSpeaking() && tts.isPaused()) {
                 tts.resume();
-            } else if (tts.isSpeaking()) {
-                tts.pause();
             } else {
-                tts.speak('Ini adalah contoh text yang panjang yang bisa di pause dan resume.');
+                tts.speak(textInput.value);
             }
-        }
+        });
 
-        // Hentikan pemutaran
-        function stopDemo() {
+        pauseButton.addEventListener('click', () => {
+            tts.pause();
+            playButton.disabled = false;
+        });
+
+        stopButton.addEventListener('click', () => {
             tts.stop();
-        }
+            playButton.disabled = false;
+            pauseButton.disabled = true;
+            stopButton.disabled = true;
+        });
+
+        // Settings Event Listeners
+        rateInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            rateValue.textContent = value;
+            tts.setRate(parseFloat(value));
+        });
+
+        pitchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            pitchValue.textContent = value;
+            tts.setPitch(parseFloat(value));
+        });
+
+        volumeInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            volumeValue.textContent = value;
+            tts.setVolume(parseFloat(value));
+        });
+
+        // Initial button states
+        pauseButton.disabled = true;
+        stopButton.disabled = true;
     </script>
 </body>
 </html>
